@@ -1,0 +1,53 @@
+@reference "../../app/globals.css";
+
+.form {
+  @apply flex flex-col gap-4 w-full max-w-sm mx-auto;
+}
+
+.field {
+  @apply flex flex-col gap-1;
+}
+
+.field label {
+  @apply text-sm text-body;
+}
+
+.field input {
+  @apply w-full bg-lighter text-heading px-4 py-2 rounded-lg outline-none;
+}
+
+.field input:focus {
+  @apply ring-2 ring-primary;
+}
+
+.passwordField {
+  @apply relative;
+}
+
+.passwordField input {
+  @apply pr-11;
+}
+
+.toggleVisibility {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 text-body cursor-pointer bg-transparent border-0;
+}
+
+.toggleVisibility:hover {
+  @apply text-heading;
+}
+
+.error {
+  @apply text-error text-sm;
+}
+
+.toggleModePrompt {
+  @apply text-center text-sm text-body;
+}
+
+.toggleModeButton {
+  @apply text-primary font-bold cursor-pointer bg-transparent border-0;
+}
+
+.toggleModeButton:hover {
+  @apply text-secondary;
+}

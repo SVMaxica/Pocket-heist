@@ -1,8 +1,10 @@
-export default function SignupPage() {
+import AuthForm from "@/components/AuthForm";
+
+export default function LoginPage() {
   return (
     <div className="center-content">
       <div className="page-content">
-        <h1 className="form-title">Sneak Back In</h1>
+        <AuthForm initialMode="login" />
       </div>
     </div>
   );

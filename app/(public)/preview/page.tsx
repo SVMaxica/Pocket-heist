@@ -1,7 +1,8 @@
 // förhandsgranskningssida för nyskapade UI-komponenter
 
-import SkeletonCard from "@/components/SkeletonCard"
-import Avatar from "@/components/Avatar"
+import SkeletonCard from "@/components/SkeletonCard";
+import Avatar from "@/components/Avatar";
+import AuthForm from "@/components/AuthForm";
 
 export default function PreviewPage() {
   return (
@@ -20,6 +21,11 @@ export default function PreviewPage() {
           <Avatar name="UserProfile" />
         </div>
       </section>
+
+      <section>
+        <h3>AuthForm</h3>
+        <AuthForm initialMode="login" />
+      </section>
     </div>
-  )
+  );
 }
