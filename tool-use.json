@@ -1,0 +1,46 @@
+{
+  "session_id": "24eefb2c-fd27-455b-a180-7de3743c2e7e",
+  "transcript_path": "/Users/sandragustafsson/.claude/projects/-Users-sandragustafsson-Desktop-Pocketheist/24eefb2c-fd27-455b-a180-7de3743c2e7e.jsonl",
+  "cwd": "/Users/sandragustafsson/Desktop/Pocketheist",
+  "prompt_id": "72e64ae6-bdab-48b7-9e4d-7a8b44f079d4",
+  "permission_mode": "default",
+  "effort": {
+    "level": "high"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "/Users/sandragustafsson/Desktop/Pocketheist/app/(public)/login/page.tsx",
+    "old_string": "        <h1 className=\"form-title\">Log in to Your Account</h1>",
+    "new_string": "        <h1 className=\"form-title\">Sneak Back In</h1>",
+    "replace_all": false
+  },
+  "tool_response": {
+    "filePath": "/Users/sandragustafsson/Desktop/Pocketheist/app/(public)/login/page.tsx",
+    "oldString": "        <h1 className=\"form-title\">Log in to Your Account</h1>",
+    "newString": "        <h1 className=\"form-title\">Sneak Back In</h1>",
+    "originalFile": "export default function SignupPage() {\n  return (\n    <div className=\"center-content\">\n      <div className=\"page-content\">\n        <h1 className=\"form-title\">Log in to Your Account</h1>\n      </div>\n    </div>\n  )\n}",
+    "structuredPatch": [
+      {
+        "oldStart": 2,
+        "oldLines": 7,
+        "newStart": 2,
+        "newLines": 7,
+        "lines": [
+          "   return (",
+          "     <div className=\"center-content\">",
+          "       <div className=\"page-content\">",
+          "-        <h1 className=\"form-title\">Log in to Your Account</h1>",
+          "+        <h1 className=\"form-title\">Sneak Back In</h1>",
+          "       </div>",
+          "     </div>",
+          "   )"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "tool_use_id": "toolu_01Mk3vWmEQzUZVEwp8JHtU5d",
+  "duration_ms": 33
+}

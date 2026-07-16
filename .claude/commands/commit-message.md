@@ -9,7 +9,7 @@ Analysera de stage:ade Git-ändringarna och skapa ett tydligt commit-meddelande.
 
 Använd presens och fokusera på varför ändringarna gjordes, inte bara vad som ändrades.
 
-## Kör följande kommandon
+## Kör följande kommandon för att få kontext
 
 ```bash
 git status
