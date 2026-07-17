@@ -1,6 +1,31 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { FirebaseError } from "firebase/app";
+
+const mockSignIn = vi.fn();
+const mockCreateUser = vi.fn();
+const mockPush = vi.fn();
+
+vi.mock("@/lib/firebase", () => ({ auth: {} }));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
+vi.mock("firebase/auth", () => ({
+  signInWithEmailAndPassword: (...args: unknown[]) => mockSignIn(...args),
+  createUserWithEmailAndPassword: (...args: unknown[]) =>
+    mockCreateUser(...args),
+  AuthErrorCodes: {
+    EMAIL_EXISTS: "auth/email-already-in-use",
+    WEAK_PASSWORD: "auth/weak-password",
+    INVALID_EMAIL: "auth/invalid-email",
+    INVALID_LOGIN_CREDENTIALS: "auth/invalid-credential",
+    INVALID_PASSWORD: "auth/wrong-password",
+    USER_DISABLED: "auth/user-disabled",
+  },
+}));
 
 // komponentimporter
 import AuthForm from "@/components/AuthForm";
@@ -8,6 +33,9 @@ import AuthForm from "@/components/AuthForm";
 describe("AuthForm", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    mockSignIn.mockReset();
+    mockCreateUser.mockReset();
+    mockPush.mockReset();
   });
 
   it("renders email and password fields in login mode", () => {
@@ -47,13 +75,12 @@ describe("AuthForm", () => {
 
   it("does not submit the form when the visibility toggle is clicked", async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     render(<AuthForm initialMode="login" />);
 
     await user.click(screen.getByRole("button", { name: /show password/i }));
     await user.click(screen.getByRole("button", { name: /hide password/i }));
 
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(mockSignIn).not.toHaveBeenCalled();
   });
 
   it("switches to signup mode and updates the title and submit button when toggled", async () => {
@@ -89,21 +116,19 @@ describe("AuthForm", () => {
     expect(screen.getByLabelText(/^password$/i)).toHaveValue("");
   });
 
-  it("shows errors and does not log when submitting empty fields", async () => {
+  it("shows errors and does not call Firebase when submitting empty fields", async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     render(<AuthForm initialMode="login" />);
 
     await user.click(screen.getByRole("button", { name: /log in/i }));
 
     expect(screen.getByText(/email is required/i)).toBeInTheDocument();
     expect(screen.getByText(/password is required/i)).toBeInTheDocument();
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(mockSignIn).not.toHaveBeenCalled();
   });
 
-  it("shows an error and does not log when the email is invalid", async () => {
+  it("shows an error and does not call Firebase when the email is invalid", async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     render(<AuthForm initialMode="login" />);
 
     await user.type(screen.getByLabelText(/email/i), "not-an-email");
@@ -114,7 +139,7 @@ describe("AuthForm", () => {
       screen.getByText(/enter a valid email address/i),
     ).toBeInTheDocument();
     expect(screen.queryByText(/password is required/i)).not.toBeInTheDocument();
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(mockSignIn).not.toHaveBeenCalled();
   });
 
   it("clears the email error as soon as the field is edited again", async () => {
@@ -128,20 +153,55 @@ describe("AuthForm", () => {
     expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument();
   });
 
-  it("logs the credentials and shows no errors on a valid submit", async () => {
+  it("calls signInWithEmailAndPassword and shows no errors on a valid login submit", async () => {
+    mockSignIn.mockResolvedValue({});
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     render(<AuthForm initialMode="login" />);
 
     await user.type(screen.getByLabelText(/email/i), "thief@heist.io");
     await user.type(screen.getByLabelText(/^password$/i), "secret");
     await user.click(screen.getByRole("button", { name: /log in/i }));
 
-    expect(logSpy).toHaveBeenCalledWith({
-      mode: "login",
-      email: "thief@heist.io",
-      password: "secret",
-    });
+    await waitFor(() =>
+      expect(mockSignIn).toHaveBeenCalledWith({}, "thief@heist.io", "secret"),
+    );
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/heists"));
     expect(screen.queryByText(/is required/i)).not.toBeInTheDocument();
+  });
+
+  it("calls createUserWithEmailAndPassword on a valid signup submit", async () => {
+    mockCreateUser.mockResolvedValue({});
+    const user = userEvent.setup();
+    render(<AuthForm initialMode="signup" />);
+
+    await user.type(screen.getByLabelText(/email/i), "thief@heist.io");
+    await user.type(screen.getByLabelText(/^password$/i), "secret");
+    await user.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() =>
+      expect(mockCreateUser).toHaveBeenCalledWith(
+        {},
+        "thief@heist.io",
+        "secret",
+      ),
+    );
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/heists"));
+    expect(screen.queryByText(/is required/i)).not.toBeInTheDocument();
+  });
+
+  it("shows a form-level error message when Firebase rejects the submission", async () => {
+    mockSignIn.mockRejectedValue(
+      new FirebaseError("auth/invalid-credential", "Invalid credential"),
+    );
+    const user = userEvent.setup();
+    render(<AuthForm initialMode="login" />);
+
+    await user.type(screen.getByLabelText(/email/i), "thief@heist.io");
+    await user.type(screen.getByLabelText(/^password$/i), "secret");
+    await user.click(screen.getByRole("button", { name: /log in/i }));
+
+    expect(
+      await screen.findByText(/incorrect email or password/i),
+    ).toBeInTheDocument();
   });
 });

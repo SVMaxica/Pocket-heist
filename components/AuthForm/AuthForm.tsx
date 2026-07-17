@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  AuthErrorCodes,
+} from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { auth } from "@/lib/firebase";
 import styles from "./AuthForm.module.css";
 
 export type AuthMode = "login" | "signup";
@@ -13,6 +21,7 @@ interface AuthFormProps {
 interface FormErrors {
   email?: string;
   password?: string;
+  form?: string;
 }
 
 // enkel e-postkontroll — avsiktligt inte fullständig RFC 5322
@@ -28,7 +37,31 @@ const SUBMIT_LABELS: Record<AuthMode, string> = {
   signup: "Sign Up",
 };
 
+// AuthErrorCodes-värdena är redan "auth/..."-koderna som Firebase kastar
+function getAuthErrorMessage(mode: AuthMode, code: string): string {
+  switch (code) {
+    case AuthErrorCodes.EMAIL_EXISTS:
+      return "An account with this email already exists";
+    case AuthErrorCodes.WEAK_PASSWORD:
+      return "Password is too weak — use at least 6 characters";
+    case AuthErrorCodes.INVALID_EMAIL:
+      return "Enter a valid email address";
+    case AuthErrorCodes.INVALID_LOGIN_CREDENTIALS:
+    case AuthErrorCodes.INVALID_PASSWORD:
+      return "Incorrect email or password";
+    case AuthErrorCodes.USER_DISABLED:
+      return "This account has been disabled";
+    case "auth/too-many-requests":
+      return "Too many attempts — please try again later";
+    default:
+      return mode === "login"
+        ? "Could not log in. Please try again."
+        : "Could not create account. Please try again.";
+  }
+}
+
 export default function AuthForm({ initialMode }: AuthFormProps) {
+  const router = useRouter();
   // initialMode läses bara en gång — läget ändras därefter enbart via växlingsknappen,
   // inte av prop-ändringar (avsiktligt)
   const [mode, setMode] = useState<AuthMode>(initialMode);
@@ -36,6 +69,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -63,7 +97,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
     setShowPassword(false);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: FormErrors = {};
@@ -84,7 +118,20 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
     }
 
     setErrors({});
-    console.log({ mode, email, password });
+    setIsSubmitting(true);
+
+    try {
+      if (mode === "signup") {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      router.push("/heists");
+    } catch (error) {
+      const code = error instanceof FirebaseError ? error.code : "unknown";
+      setErrors({ form: getAuthErrorMessage(mode, code) });
+      setIsSubmitting(false);
+    }
   }
 
   const isLogin = mode === "login";
@@ -141,7 +188,13 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
         )}
       </div>
 
-      <button type="submit" className="btn">
+      {errors.form && (
+        <p role="alert" className={styles.error}>
+          {errors.form}
+        </p>
+      )}
+
+      <button type="submit" className="btn" disabled={isSubmitting}>
         {SUBMIT_LABELS[mode]}
       </button>
 
