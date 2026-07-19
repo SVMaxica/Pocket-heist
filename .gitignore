@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code (lokala permission-inställningar)
 .claude/settings.local.json
+
+# claude code (innehåller MCP-nycklar i klartext)
+.mcp.json
