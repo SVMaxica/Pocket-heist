@@ -1,0 +1,9 @@
+@reference "../../app/globals.css";
+
+.loader {
+  @apply flex items-center justify-center min-h-lvh bg-dark;
+}
+
+.spinner {
+  @apply animate-spin text-primary w-10 h-10;
+}

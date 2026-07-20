@@ -1,0 +1,9 @@
+@reference "../../app/globals.css";
+
+.errorWrap {
+  @apply flex items-center justify-center min-h-lvh bg-dark px-4;
+}
+
+.error {
+  @apply text-error text-center;
+}

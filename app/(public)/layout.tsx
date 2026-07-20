@@ -1,11 +1,15 @@
+import RouteGuard from "@/components/RouteGuard";
+
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <main className="public">
-      {children}
+      <RouteGuard mode="require-unauthenticated" redirectTo="/heists">
+        {children}
+      </RouteGuard>
     </main>
-  )
+  );
 }
