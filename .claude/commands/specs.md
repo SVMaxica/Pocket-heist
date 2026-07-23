@@ -4,7 +4,9 @@ argument-hint: Kort beskrivning av funktionen
 allowed-tools: Read, Write, Glob, Bash(git switch:*)
 ---
 
-Du ska hjälpa till att skapa en ny funktionsspecifikation för projektet utifrån användarens beskrivning nedan. Följ alltid eventuella regler eller riktlinjer som finns i projektets `CLAUDE.md`-filer.
+Du ska hjälpa till att skapa en ny funktionsspecifikation för projektet utifrån användarens beskrivning nedan.
+
+Följ alltid eventuella regler eller riktlinjer som finns i projektets `CLAUDE.md`-filer.
 
 Användarens beskrivning:
 
@@ -19,6 +21,10 @@ Din uppgift är att omvandla användarens beskrivning till:
 - En säker Git-branch som inte redan finns.
 - En detaljerad specifikation i Markdown som sparas i mappen `_specs`.
 
+Om det finns en designreferens ska specifikationen alltid baseras på den.
+
+Använd subagenten **`figma-design-extractor`** för att analysera designen innan specifikationen skrivs.
+
 När allt är klart ska specifikationen sparas och du ska ge användaren en kort sammanfattning.
 
 ---
@@ -29,13 +35,13 @@ Kontrollera vilken Git-branch som är aktiv.
 
 Om arbetskatalogen innehåller:
 
-- ej committade ändringar,
-- ostagade ändringar,
-- eller ospårade filer,
+- ej committade ändringar
+- ostagade ändringar
+- ospårade filer
 
 ska processen avbrytas direkt.
 
-Be användaren att först committa eller stasha sina ändringar innan du fortsätter.
+Be användaren att först committa eller stasha sina ändringar.
 
 Gå inte vidare förrän arbetskatalogen är ren.
 
@@ -45,7 +51,7 @@ Gå inte vidare förrän arbetskatalogen är ren.
 
 Utifrån `$ARGUMENTS` ska du ta fram:
 
-### 1. feature_title
+### feature_title
 
 En kort och tydlig titel i **Title Case**.
 
@@ -55,7 +61,7 @@ Exempel:
 
 ---
 
-### 2. feature_slug
+### feature_slug
 
 Ett Git-säkert namn enligt följande regler:
 
@@ -69,23 +75,31 @@ Ett Git-säkert namn enligt följande regler:
 
 Exempel:
 
-`kortkomponent`
+```
+kortkomponent
+```
 
 eller
 
-`kortkomponent-dashboard`
+```
+kortkomponent-dashboard
+```
 
 ---
 
-### 3. branch_name
+### branch_name
 
 Format:
 
-`claude/feature/<feature_slug>`
+```
+claude/feature/<feature_slug>
+```
 
 Exempel:
 
-`claude/feature/kortkomponent`
+```
+claude/feature/kortkomponent
+```
 
 Om det inte går att avgöra ett rimligt namn ska du be användaren förtydliga istället för att gissa.
 
@@ -99,11 +113,50 @@ Om branchen redan finns ska ett versionsnummer läggas till automatiskt.
 
 Exempel:
 
-`claude/feature/kortkomponent-01`
+```
+claude/feature/kortkomponent-01
+```
 
 ---
 
-## Steg 4 – Skapa specifikationen
+## Steg 4 – Samla in designreferenser
+
+Innan specifikationen skapas ska du undersöka om det finns en designreferens.
+
+Om användaren har hänvisat till:
+
+- en Figma-länk
+- en Figma-komponent
+- en Figma-fil
+- en skärmbild av designen
+
+ska du använda subagenten:
+
+```
+figma-design-extractor
+```
+
+Subagenten ansvarar för att:
+
+- analysera Figma-designen
+- eller, om ingen Figma-fil finns, leta efter en Figma-bild i projektets `public`-mapp (vanligtvis innehåller filnamnet ordet `figma`)
+- extrahera layout
+- färger
+- typografi
+- spacing
+- komponentstruktur
+- ikoner
+- komponenternas olika tillstånd
+- responsivt beteende
+- tillgänglighetskrav
+
+Resultatet från subagenten ska användas som underlag när specifikationen skrivs.
+
+Om ingen designreferens hittas ska du fortsätta utifrån användarens beskrivning och tydligt ange vilka delar som bygger på antaganden.
+
+---
+
+## Steg 5 – Skapa specifikationen
 
 Skapa en Markdown-specifikation som kan användas direkt i **Plan mode**.
 
@@ -111,17 +164,31 @@ Specifikationen ska:
 
 - sparas i mappen `_specs`
 - använda `feature_slug` som filnamn
-- följa exakt samma struktur som mallen i
+- följa exakt samma struktur som mallen
 
-`@_specs/template.md`
+```
+@_specs/template.md
+```
 
-Lägg **inte** till tekniska implementationsdetaljer, kodexempel eller lösningsförslag.
+Om designinformation har hämtats från `figma-design-extractor` ska den integreras naturligt i specifikationen, exempelvis under:
 
-Fokusera endast på vad som ska byggas.
+- Sammanfattning
+- Funktionella krav
+- Figma-referens
+- Acceptanskriterier
+- Edge Cases
+
+Lägg **inte** till tekniska implementationsdetaljer.
+
+Lägg **inte** till kodexempel.
+
+Lägg **inte** till lösningsförslag.
+
+Specifikationen ska beskriva **vad** som ska byggas, inte **hur** det ska implementeras.
 
 ---
 
-## Steg 5 – Svara användaren
+## Steg 6 – Svara användaren
 
 När filen har sparats ska du svara med följande format:
 
@@ -131,10 +198,12 @@ Specifikation: specs/<feature_slug>.md
 Titel: <feature_title>
 ```
 
-Visa **inte** hela specifikationen i chatten om inte användaren uttryckligen ber om det.
+Visa inte hela specifikationen i chatten om inte användaren uttryckligen ber om det.
 
 Målet är att:
 
-- skapa och spara specifikationen,
-- skapa rätt Git-branch,
-- och tala om för användaren var specifikationen finns.
+- skapa Git-branchen
+- skapa specifikationen
+- spara den i `_specs`
+- använda designanalysen från `figma-design-extractor` när en design finns
+- tala om för användaren var specifikationen finns
