@@ -1,0 +1,21 @@
+@reference "../../app/globals.css";
+
+.loader {
+  @apply flex items-center justify-center py-8;
+}
+
+.spinner {
+  @apply animate-spin text-primary w-8 h-8;
+}
+
+.list {
+  @apply flex flex-col gap-2;
+}
+
+.hint {
+  @apply text-body text-sm;
+}
+
+.error {
+  @apply text-error text-sm;
+}
