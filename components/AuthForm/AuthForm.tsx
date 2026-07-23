@@ -6,10 +6,17 @@ import { Eye, EyeOff } from "lucide-react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
   AuthErrorCodes,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth } from "@/lib/firebase";
+import {
+  claimCodenameAndCreateUser,
+  isCodenameAvailable,
+  CodenameTakenError,
+} from "@/lib/codenames";
+import { generateCodenameSuggestions } from "@/lib/codenameSuggestions";
 import styles from "./AuthForm.module.css";
 
 export type AuthMode = "login" | "signup";
@@ -21,6 +28,7 @@ interface AuthFormProps {
 interface FormErrors {
   email?: string;
   password?: string;
+  codename?: string;
   form?: string;
 }
 
@@ -67,6 +75,8 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [codename, setCodename] = useState("");
+  const [suggestions] = useState(() => generateCodenameSuggestions());
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,6 +95,20 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
     }
   }
 
+  function handleCodenameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setCodename(event.target.value);
+    if (errors.codename) {
+      setErrors((prev) => ({ ...prev, codename: undefined }));
+    }
+  }
+
+  function handleSuggestionClick(suggestion: string) {
+    setCodename(suggestion);
+    if (errors.codename) {
+      setErrors((prev) => ({ ...prev, codename: undefined }));
+    }
+  }
+
   function handleTogglePasswordVisibility() {
     setShowPassword((prev) => !prev);
   }
@@ -93,6 +117,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
     setEmail("");
     setPassword("");
+    setCodename("");
     setErrors({});
     setShowPassword(false);
   }
@@ -112,7 +137,11 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
       nextErrors.password = "Password is required";
     }
 
-    if (nextErrors.email || nextErrors.password) {
+    if (mode === "signup" && codename.trim() === "") {
+      nextErrors.codename = "Codename is required";
+    }
+
+    if (nextErrors.email || nextErrors.password || nextErrors.codename) {
       setErrors(nextErrors);
       return;
     }
@@ -122,7 +151,33 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
 
     try {
       if (mode === "signup") {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Kollas innan kontot skapas: en lyckad createUserWithEmailAndPassword
+        // gör användaren omedelbart inloggad, vilket triggar route-guards
+        // (redirect bort från /signup) innan en eventuell rollback hinner ske.
+        const available = await isCodenameAvailable(codename);
+        if (!available) {
+          setErrors({ codename: "That codename is already taken" });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const credential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+        try {
+          await claimCodenameAndCreateUser(credential.user.uid, codename);
+        } catch (codenameError) {
+          await deleteUser(credential.user);
+          setErrors(
+            codenameError instanceof CodenameTakenError
+              ? { codename: "That codename is already taken" }
+              : { form: "Could not create account. Please try again." },
+          );
+          setIsSubmitting(false);
+          return;
+        }
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
@@ -187,6 +242,39 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
           </p>
         )}
       </div>
+
+      {mode === "signup" && (
+        <div className={styles.field}>
+          <label htmlFor="auth-codename">Codename</label>
+          <input
+            id="auth-codename"
+            type="text"
+            value={codename}
+            onChange={handleCodenameChange}
+            aria-invalid={errors.codename ? true : undefined}
+            aria-describedby={
+              errors.codename ? "auth-codename-error" : undefined
+            }
+          />
+          <div className={styles.suggestions}>
+            {suggestions.map((suggestion) => (
+              <button
+                type="button"
+                key={suggestion}
+                className={styles.suggestionChip}
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+          {errors.codename && (
+            <p id="auth-codename-error" className={styles.error}>
+              {errors.codename}
+            </p>
+          )}
+        </div>
+      )}
 
       {errors.form && (
         <p role="alert" className={styles.error}>

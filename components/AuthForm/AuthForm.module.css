@@ -36,6 +36,18 @@
   @apply text-heading;
 }
 
+.suggestions {
+  @apply flex flex-wrap gap-2 mt-1;
+}
+
+.suggestionChip {
+  @apply text-xs text-body bg-lighter px-3 py-1 rounded-full cursor-pointer transition-colors border-0;
+}
+
+.suggestionChip:hover {
+  @apply text-heading bg-light;
+}
+
 .error {
   @apply text-error text-sm;
 }

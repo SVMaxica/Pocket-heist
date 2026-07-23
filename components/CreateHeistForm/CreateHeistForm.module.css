@@ -1,0 +1,37 @@
+@reference "../../app/globals.css";
+
+.form {
+  @apply flex flex-col gap-4 w-full max-w-sm mx-auto;
+}
+
+.field {
+  @apply flex flex-col gap-1;
+}
+
+.field label {
+  @apply text-sm text-body;
+}
+
+.field input,
+.field textarea,
+.field select {
+  @apply w-full bg-lighter text-heading px-4 py-2 rounded-lg outline-none;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  @apply ring-2 ring-primary;
+}
+
+.field textarea {
+  @apply min-h-24 resize-y;
+}
+
+.hint {
+  @apply text-body text-sm;
+}
+
+.error {
+  @apply text-error text-sm;
+}
