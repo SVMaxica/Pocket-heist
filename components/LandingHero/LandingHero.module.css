@@ -1,0 +1,104 @@
+@reference "../../app/globals.css";
+
+.hero {
+  @apply py-16 md:py-24;
+  animation: heroIn 0.6s ease-out both;
+}
+
+.wordmark {
+  @apply flex items-center gap-1 text-left text-sm font-bold text-body mb-12 md:mb-16;
+}
+
+.wordmarkIcon {
+  display: inline-block;
+}
+
+.layout {
+  @apply flex flex-col items-center text-center gap-10;
+  @apply md:grid md:grid-cols-[1fr_auto] md:items-start md:text-left md:gap-12;
+}
+
+.brief {
+  @apply max-w-2xl;
+}
+
+.eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.35em] text-secondary mb-4;
+}
+
+.headline {
+  @apply !text-4xl md:!text-6xl lg:!text-7xl !leading-[1.05] font-black tracking-tight;
+}
+
+.headline em {
+  @apply not-italic bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent;
+}
+
+.body {
+  @apply text-body text-base md:text-lg leading-relaxed max-w-xl mt-6;
+}
+
+.actions {
+  @apply flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-3 mt-10;
+}
+
+.cta {
+  @apply inline-flex items-center gap-2 bg-linear-to-r from-primary to-secondary text-heading font-bold px-6 py-3 rounded-full transition-opacity;
+}
+
+.cta:hover {
+  @apply opacity-90;
+}
+
+.cta:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-offset-dark ring-primary;
+}
+
+.secondaryLink {
+  @apply text-body text-sm underline decoration-body/40 underline-offset-4 transition-colors;
+}
+
+.secondaryLink:hover {
+  @apply text-heading;
+}
+
+.stamp {
+  @apply flex items-center justify-center shrink-0 mx-auto md:mx-0;
+  @apply w-24 h-24 md:w-36 md:h-36 rotate-[-8deg];
+  @apply border-2 border-double border-primary rounded-full;
+  animation: stampIn 0.5s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.stamp span {
+  @apply px-2 text-center text-[0.6rem] md:text-xs font-black uppercase tracking-[0.2em] leading-tight;
+  @apply bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent;
+}
+
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stampIn {
+  from {
+    opacity: 0;
+    transform: rotate(-18deg) scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .stamp {
+    animation: none;
+  }
+}
