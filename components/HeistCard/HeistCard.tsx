@@ -13,7 +13,12 @@ export default function HeistCard({ heist }: HeistCardProps) {
     month: "short",
     day: "numeric",
   });
-  const { label: timeStatus } = getHeistTimeStatus(heist.deadline);
+  const { label: timeStatus, isOverdue } = getHeistTimeStatus(heist.deadline);
+  const resultBadge = isOverdue
+    ? heist.finalStatus === "success"
+      ? { label: "Success", className: styles.resultBadgeSuccess }
+      : { label: "Expired", className: styles.resultBadgeExpired }
+    : null;
 
   return (
     <article className={styles.card}>
@@ -21,12 +26,20 @@ export default function HeistCard({ heist }: HeistCardProps) {
         <Link href={`/heists/${heist.id}`} className={styles.titleLink}>
           <h3 className={styles.title}>{heist.title}</h3>
         </Link>
-        <Clock8
-          className={styles.statusIcon}
-          size={16}
-          strokeWidth={2.75}
-          aria-hidden="true"
-        />
+        <div className={styles.statusGroup}>
+          {resultBadge && (
+            <span className={`${styles.resultBadge} ${resultBadge.className}`}>
+              <span className="sr-only">Result: </span>
+              {resultBadge.label}
+            </span>
+          )}
+          <Clock8
+            className={`${styles.statusIcon} ${isOverdue ? styles.statusIconOverdue : ""}`}
+            size={16}
+            strokeWidth={2.75}
+            aria-hidden="true"
+          />
+        </div>
       </div>
 
       <p className={styles.metaRow}>
@@ -48,7 +61,11 @@ export default function HeistCard({ heist }: HeistCardProps) {
         <Calendar size={14} strokeWidth={2.75} aria-hidden="true" />
         {deadlineDate}
         <span aria-hidden="true">•</span>
-        <span className={styles.timeStatus}>{timeStatus}</span>
+        <span
+          className={`${styles.timeStatus} ${isOverdue ? styles.timeStatusOverdue : ""}`}
+        >
+          {timeStatus}
+        </span>
       </p>
     </article>
   );

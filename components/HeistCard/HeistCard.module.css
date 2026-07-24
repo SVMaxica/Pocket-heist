@@ -26,6 +26,26 @@
   @apply text-primary shrink-0;
 }
 
+.statusIconOverdue {
+  @apply text-error;
+}
+
+.statusGroup {
+  @apply flex items-center gap-2 shrink-0;
+}
+
+.resultBadge {
+  @apply text-xs font-bold uppercase tracking-wide rounded-full px-2 py-0.5;
+}
+
+.resultBadgeSuccess {
+  @apply bg-success/15 text-success;
+}
+
+.resultBadgeExpired {
+  @apply bg-error/15 text-error;
+}
+
 .metaRow {
   @apply flex items-center gap-1.5 text-sm text-body;
 }
@@ -44,4 +64,8 @@
 
 .timeStatus {
   @apply text-primary;
+}
+
+.timeStatusOverdue {
+  @apply text-error;
 }
