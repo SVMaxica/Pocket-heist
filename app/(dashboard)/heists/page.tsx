@@ -1,5 +1,5 @@
 import HeistCardGrid from "@/components/HeistCardGrid";
-import HeistTitleList from "@/components/HeistTitleList";
+import HeistCardList from "@/components/HeistCardList";
 
 export default function HeistsPage() {
   return (
@@ -14,7 +14,7 @@ export default function HeistsPage() {
       </div>
       <div className="expired-heists">
         <h2>All Expired Heists</h2>
-        <HeistTitleList mode="expired" />
+        <HeistCardList />
       </div>
     </div>
   );

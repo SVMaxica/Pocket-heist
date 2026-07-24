@@ -1,0 +1,13 @@
+@reference "../../app/globals.css";
+
+.list {
+  @apply flex flex-col gap-4 w-full list-none m-0 p-0;
+}
+
+.hint {
+  @apply text-body text-sm;
+}
+
+.error {
+  @apply text-error text-sm;
+}

@@ -68,4 +68,38 @@ describe("HeistCard", () => {
 
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
+
+  it("shows a Success badge when an overdue heist finished successfully", () => {
+    const deadline = new Date(Date.now() - 60 * 60 * 1000);
+    render(
+      <HeistCard heist={makeHeist({ deadline, finalStatus: "success" })} />,
+    );
+
+    expect(screen.getByText("Success")).toBeInTheDocument();
+    expect(screen.queryByText("Expired")).not.toBeInTheDocument();
+  });
+
+  it("shows an Expired badge when an overdue heist was never completed", () => {
+    const deadline = new Date(Date.now() - 60 * 60 * 1000);
+    render(<HeistCard heist={makeHeist({ deadline, finalStatus: null })} />);
+
+    expect(screen.getByText("Expired")).toBeInTheDocument();
+  });
+
+  it("shows an Expired badge when an overdue heist failed", () => {
+    const deadline = new Date(Date.now() - 60 * 60 * 1000);
+    render(
+      <HeistCard heist={makeHeist({ deadline, finalStatus: "failure" })} />,
+    );
+
+    expect(screen.getByText("Expired")).toBeInTheDocument();
+  });
+
+  it("shows no result badge when the deadline hasn't passed", () => {
+    const deadline = new Date(Date.now() + 60 * 60 * 1000);
+    render(<HeistCard heist={makeHeist({ deadline })} />);
+
+    expect(screen.queryByText("Success")).not.toBeInTheDocument();
+    expect(screen.queryByText("Expired")).not.toBeInTheDocument();
+  });
 });
