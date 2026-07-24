@@ -1,0 +1,31 @@
+@reference "../../app/globals.css";
+
+/* Samma yttre mått/padding som HeistCard .card, så rutnätet inte hoppar när
+   riktiga kort ersätter skeletonen. */
+.card {
+  @apply bg-light rounded-xl p-6 w-full flex flex-col gap-3 animate-pulse;
+}
+
+.header {
+  @apply flex items-start justify-between gap-2;
+}
+
+.line {
+  @apply h-4 rounded-full bg-body/20;
+}
+
+.titleLine {
+  @apply h-5 w-3/4;
+}
+
+.iconPlaceholder {
+  @apply w-4 h-4 rounded-full bg-body/20 shrink-0;
+}
+
+.metaLine {
+  @apply w-1/2;
+}
+
+.dateLine {
+  @apply w-1/3;
+}

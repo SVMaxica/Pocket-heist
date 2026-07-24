@@ -1,0 +1,47 @@
+@reference "../../app/globals.css";
+
+.card {
+  @apply bg-light rounded-xl p-6 w-full flex flex-col gap-3;
+}
+
+.header {
+  @apply flex items-start justify-between gap-2;
+}
+
+.titleLink {
+  @apply rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2;
+}
+
+/* h3 har en explicit text-heading-färg via globals.css, så hover-färgen måste
+   sättas på själva titeln — inte på länken — för att slå igenom. */
+.title {
+  @apply font-bold leading-snug line-clamp-2 transition-colors;
+}
+
+.titleLink:hover .title {
+  @apply text-primary;
+}
+
+.statusIcon {
+  @apply text-primary shrink-0;
+}
+
+.metaRow {
+  @apply flex items-center gap-1.5 text-sm text-body;
+}
+
+.dateRow {
+  @apply flex items-center gap-1.5 text-sm text-body;
+}
+
+.assigneeCodename {
+  @apply text-primary;
+}
+
+.creatorCodename {
+  @apply text-secondary;
+}
+
+.timeStatus {
+  @apply text-primary;
+}

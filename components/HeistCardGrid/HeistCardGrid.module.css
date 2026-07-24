@@ -1,0 +1,15 @@
+@reference "../../app/globals.css";
+
+/* 1 kolumn (mobil) → 2 kolumner (tablet, md ≥768px) → 3 kolumner (desktop,
+   lg ≥1024px). Tailwind v4:s standardbrytpunkter. */
+.grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.hint {
+  @apply text-body text-sm;
+}
+
+.error {
+  @apply text-error text-sm;
+}
